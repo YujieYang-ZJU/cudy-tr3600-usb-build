@@ -29,7 +29,7 @@ if [[ "$phase" == prepare ]]; then
   [[ -x "$compiler" ]]
   [[ $("$compiler" -dumpfullversion) == 14.4.0 ]]
   dirname "$(dirname "$compiler")" > "$audit/toolchain-root.txt"
-  "$compiler" -v 2> "$audit/compiler-version.txt"
+  "$compiler" -v -E -x c /dev/null -o /dev/null 2> "$audit/compiler-version.txt"
   exit 0
 fi
 
