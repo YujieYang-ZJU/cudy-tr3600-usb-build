@@ -103,5 +103,7 @@ jobs:
             full-audit/*.json
             full-audit/build.config
             full-openwrt/.config
+            full-openwrt/tmp/.config-package.in
+            full-openwrt/tmp/.packageinfo
           if-no-files-found: warn
           retention-days: 14
