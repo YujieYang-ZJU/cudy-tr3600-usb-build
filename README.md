@@ -1,6 +1,6 @@
 # Cudy TR3600 V1 USB 上网适配
 
-让 Cudy TR3600 V1 使用中兴 F50 Pro 的 USB 网络共享。首个版本提供适配 **Crostia v1.9 特定内核构建**的五个 APK、构建脚本、源码与安装教程；后续准备内置 USB 驱动的社区固件。
+让 Cudy TR3600 V1 使用中兴 F50 Pro 的 USB 网络共享。首个版本提供适配 **Crostia v1.9 特定内核构建**的五个 APK、构建脚本、源码与安装教程；同时提供内置 USB 驱动和 OpenClash 界面及依赖的社区固件候选版。
 
 本项目基于 OpenWrt、Crostia 的固件及社区设备补丁，保留上游作者和许可证。它是社区适配项目，与 Cudy、中兴或 OpenWrt 官方发布没有隶属关系。
 
@@ -46,9 +46,9 @@
 
 ## 完整固件
 
-正在准备沿用上述源码基线、内置 USB 网络驱动、中文 LuCI 及 OpenClash 界面和依赖的[社区固件候选版](docs/FIRMWARE.md)。新固件及其 kmod 将同次构建、同期归档，使用自身正常的 kernel 依赖，不沿用旧固件的依赖元数据适配。
+沿用上述源码基线、内置 USB 网络驱动、中文 LuCI 及 OpenClash 界面和依赖的[社区固件候选版](docs/FIRMWARE.md)已于 2026-10-15 完成构建、CI 检查及本机独立镜像核验，见[成功构建记录](https://github.com/YujieYang-ZJU/cudy-tr3600-usb-build/actions/runs/38589561648)。新固件及其 kmod 同次构建、同期归档，使用自身正常的 kernel 依赖，不沿用旧固件的依赖元数据适配。
 
-完整固件发布前需完成镜像检查和真机测试。历史的 `build-firmware.sh` 与 `config/` 是已停止推进的 25.12 实验配方，不能作为当前已实测驱动方案的安装入口。
+完整固件尚未真机刷写验证，保持候选版标识；已实测的是原固件补装驱动方案。历史的 `build-firmware.sh` 与 `config/` 是已停止推进的 25.12 实验配方，不能作为当前已实测驱动方案的安装入口。
 
 ## 来源与许可
 

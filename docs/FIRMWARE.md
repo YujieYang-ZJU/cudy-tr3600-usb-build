@@ -6,6 +6,17 @@
 
 新固件的 kernel 和驱动在同次构建中生成，使用其自身正常的 kernel 依赖。Crostia v1.9 补装包的特定元数据适配不用于完整固件。
 
+## 当前候选版
+
+2026-10-15 的[完整构建记录](https://github.com/YujieYang-ZJU/cudy-tr3600-usb-build/actions/runs/38589561648)已成功，构建配方提交为 `d908abc`。CI 的镜像、实际 rootfs 和驱动匹配检查，以及下载到 Mac 后的独立镜像检查均已通过。尚未进行真机刷写验证。
+
+- [固件、同批驱动 APK、包归档和检查记录](https://github.com/YujieYang-ZJU/cudy-tr3600-usb-build/actions/runs/38589561648/artifacts/11912866034)
+- [对应源码和源码校验值](https://github.com/YujieYang-ZJU/cudy-tr3600-usb-build/actions/runs/38589561648/artifacts/11913110889)
+
+Actions 附件保存 14 天，下载需要登录 GitHub。固件镜像为 `openwrt-mediatek-filogic-cudy_tr3600-v1-squashfs-sysupgrade.bin`，大小 22,343,949 字节，SHA256 为 `6a4a93747c5087cbdf8ca2302ec412cbc9708295ccc6aa484d7fc2430cb5b336`。
+
+此候选版的完整 kernel 包版本为 `6.18.54~8614d981ea369882bad408b8b0878867-r1`。使用它随附的同批 APK；适配 Crostia v1.9 原固件的补装 APK 属于另一套 kernel 依赖，不能混用。
+
 ## 构建
 
 Actions 手动运行 **Build TR3600 V1 community firmware with USB and OpenClash**。默认从源码构建固定 GCC 14.4.0 工具链，避免依赖滚动 snapshots 的预编译工具链 URL。
