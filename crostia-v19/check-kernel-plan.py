@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-2.0-only
 """Mirror Kernel/Configure/Default for a fast pre-compilation hash check."""
 import hashlib
 import json

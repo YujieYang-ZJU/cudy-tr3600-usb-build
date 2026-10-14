@@ -1,4 +1,4 @@
-name: Build TR3600 V1 USB firmware
+name: Legacy 25.12 experiment - not the current tested release
 
 on:
   workflow_dispatch:

@@ -1,0 +1,7 @@
+Project build scripts and documentation: SPDX-License-Identifier: GPL-2.0-only
+See LICENSE for the GNU General Public License version 2.
+
+Upstream components retain their copyright holders and applicable licenses.
+The hardware DTS patch includes its original dual GPL-2.0-or-later OR MIT notice.
+The Linux kernel, OpenWrt build system, feeds and firmware blobs retain their
+respective license notices. See NOTICE.txt and the corresponding source assets.

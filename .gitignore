@@ -1,0 +1,16 @@
+__pycache__/
+*.pyc
+/openwrt/
+/usb-openwrt/
+/usb-toolchain/
+/usb-audit/
+/usb-artifacts/
+/artifacts/
+/full-openwrt/
+/full-artifacts/
+/full-audit/
+*.log
+/openwrt-toolchain-*.tar.zst
+*.apk
+/release/*.zip
+/release/*.tar.*

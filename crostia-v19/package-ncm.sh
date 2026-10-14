@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-2.0-only
 set -euo pipefail
 recipe=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
 source_dir=${1:?source directory}

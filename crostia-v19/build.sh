@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-2.0-only
 set -euo pipefail
 recipe=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
 root=$(cd "$recipe/.." && pwd)
@@ -18,10 +19,22 @@ if [[ "$phase" == prepare ]]; then
   [[ ! -e "$source_dir" ]]
   git init "$source_dir"
   git -C "$source_dir" remote add origin https://github.com/openwrt/openwrt.git
-  git -C "$source_dir" fetch --depth=1 origin "$commit"
+  if [[ -f "$root/openwrt-source.bundle" ]]; then
+    printf '%s  %s\n' 2a3fd01a2c17e34abf4270b2d0ba89160bec89560f027226113f7bd06e8ddc22 "$root/openwrt-source.bundle" | sha256sum -c -
+    git -C "$source_dir" fetch "$root/openwrt-source.bundle" HEAD
+    printf '%s\n' "$commit" > "$source_dir/.git/shallow"
+  else
+    git -C "$source_dir" fetch --depth=1 origin "$commit"
+  fi
   git -C "$source_dir" checkout --detach FETCH_HEAD
+  [[ $(git -C "$source_dir" rev-parse HEAD) == "$commit" ]]
   git -C "$source_dir" apply --check "$recipe/tr3600-support-rebased.patch"
   git -C "$source_dir" apply "$recipe/tr3600-support-rebased.patch"
+  if [[ -f "$root/linux-6.18.54.tar.xz" ]]; then
+    printf '%s  %s\n' 9df30b02dd8102bbd0be52556288ef6889ddbe7f1ddb96fbf847d0becf3eacac "$root/linux-6.18.54.tar.xz" | sha256sum -c -
+    mkdir -p "$source_dir/dl"
+    cp "$root/linux-6.18.54.tar.xz" "$source_dir/dl/"
+  fi
   archive=openwrt-toolchain-mediatek-filogic_gcc-14.4.0_musl.Linux-x86_64.tar.zst
   if [[ ! -f "$root/$archive" ]]; then
     curl --fail --location --retry 3 "https://downloads.openwrt.org/snapshots/targets/mediatek/filogic/$archive" -o "$root/$archive"

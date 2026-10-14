@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-2.0-only
 """Fail the build if the device metadata or required packages are incorrect."""
 import json
 import pathlib
