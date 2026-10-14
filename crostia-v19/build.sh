@@ -23,7 +23,9 @@ if [[ "$phase" == prepare ]]; then
   git -C "$source_dir" apply --check "$recipe/tr3600-support-rebased.patch"
   git -C "$source_dir" apply "$recipe/tr3600-support-rebased.patch"
   archive=openwrt-toolchain-mediatek-filogic_gcc-14.4.0_musl.Linux-x86_64.tar.zst
-  curl --fail --location --retry 3 "https://downloads.openwrt.org/snapshots/targets/mediatek/filogic/$archive" -o "$root/$archive"
+  if [[ ! -f "$root/$archive" ]]; then
+    curl --fail --location --retry 3 "https://downloads.openwrt.org/snapshots/targets/mediatek/filogic/$archive" -o "$root/$archive"
+  fi
   printf '%s  %s\n' 03071eac19d1f3906e79dc66d0f41c492aa40a005e3d3e2a8b5e33ca7b2a54c4 "$root/$archive" | sha256sum -c -
   mkdir "$root/usb-toolchain"
   tar --zstd -xf "$root/$archive" -C "$root/usb-toolchain"
