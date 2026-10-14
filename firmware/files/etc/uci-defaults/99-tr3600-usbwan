@@ -1,0 +1,25 @@
+#!/bin/sh
+# SPDX-License-Identifier: GPL-2.0-only
+# Fresh configurations use the F50 Pro's tested USB device name.
+# Existing usbwan configurations are preserved on sysupgrade.
+. /lib/functions.sh
+uci -q get network.usbwan >/dev/null && exit 0
+uci set network.usbwan=interface
+uci set network.usbwan.proto='dhcp'
+uci set network.usbwan.device='eth2'
+uci set network.usbwan.metric='10'
+uci commit network
+add_usbwan_to_zone() {
+    local section="$1" name networks
+    config_get name "$section" name
+    [ "$name" = wan ] || return 0
+    config_get networks "$section" network
+    case " $networks " in
+        *' usbwan '*) ;;
+        *) uci add_list "firewall.$section.network=usbwan" ;;
+    esac
+}
+config_load firewall
+config_foreach add_usbwan_to_zone zone
+uci commit firewall
+exit 0

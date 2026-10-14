@@ -9,6 +9,11 @@ __pycache__/
 /full-openwrt/
 /full-artifacts/
 /full-audit/
+/full-feed-*/
+/full-openclash/
+/full-toolchain/
+/input-cache/
+/full-source.*/
 *.log
 /openwrt-toolchain-*.tar.zst
 *.apk

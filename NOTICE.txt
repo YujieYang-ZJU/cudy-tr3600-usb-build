@@ -23,3 +23,10 @@ Historical, discontinued 25.12 recipe:
 This is a community project, not an official Cudy, ZTE or OpenWrt release.
 Device and project names identify compatibility and upstream provenance.
 See docs/TESTED.md for the scope and limitations of physical testing.
+
+Full firmware candidate additionally includes:
+  OpenClash 0.48.002, vernesong/OpenClash@e553e82e01c697aefbe1555261a503f425e00ccd
+  MIT License; Copyright (c) 2019-2026 vernesong.
+  Its original license is preserved in the source and firmware rootfs.
+  New firmware uses normal same-build kernel dependencies; the tested old-firmware
+  APK compatibility adaptation is not applied to its kernel package metadata.

@@ -1,0 +1,6 @@
+{
+  "openwrt": {"url":"https://github.com/openwrt/openwrt.git","commit":"31ef8052449426249b8ea364444df9adab80bfef"},
+  "packages": {"url":"https://github.com/openwrt/packages.git","commit":"5ff92c77ade64e4b36c0412f0a114c9690bca47d"},
+  "luci": {"url":"https://github.com/openwrt/luci.git","commit":"32775cf32b94ecf12bca08ce62aeb2723d2d51ce"},
+  "openclash": {"url":"https://github.com/vernesong/OpenClash.git","commit":"e553e82e01c697aefbe1555261a503f425e00ccd","version":"0.48.002","license":"MIT"}
+}
