@@ -1,0 +1,60 @@
+{
+  "kernel_dependency": "6.18.54~65a6123c8ad58cc9838d7f2e4fb4e60a-r1",
+  "physical_device_tested": false,
+  "original_pr_tested_binaries": false,
+  "packages": {
+    "kmod-mii": {
+      "filename": "kmod-mii-6.18.54-r1.apk",
+      "bytes": 4420,
+      "sha256": "78dcbb956e4b07e41d5d0609f44036796632cea2dc204adc00d7e1410f4584b8",
+      "module_sha256": "dd452858772d3558508380b857fb5df9aad6d5429de1088e8dddc972df0f3526",
+      "module": "mii.ko",
+      "architecture": "AArch64",
+      "depends": "",
+      "vermagic": "6.18.54 SMP mod_unload aarch64",
+      "autoload": {
+        "etc/modules-boot.d/15-mii": "mii\n",
+        "etc/modules.d/15-mii": "mii\n"
+      }
+    },
+    "kmod-usb-net": {
+      "filename": "kmod-usb-net-6.18.54-r1.apk",
+      "bytes": 14829,
+      "sha256": "0dcd8bed5704c86387a6473665224e80891e26d2cee8001e1c01d0b05ab33d0c",
+      "module_sha256": "28fc67ac66c051828e18552474d822df9bcda8bbea91b580a5f68a02cc73a765",
+      "module": "usbnet.ko",
+      "architecture": "AArch64",
+      "depends": "usbcore,mii",
+      "vermagic": "6.18.54 SMP mod_unload aarch64",
+      "autoload": {
+        "etc/modules.d/usb-net": "usbnet\n"
+      }
+    },
+    "kmod-usb-net-cdc-ether": {
+      "filename": "kmod-usb-net-cdc-ether-6.18.54-r1.apk",
+      "bytes": 5268,
+      "sha256": "649c8df880a3d3471d5086ebb61783f704bd2682c5bb1258e5cab72c4a7e1fd1",
+      "module_sha256": "27cc03cec518ea85a71a6d01297757c8a1e5a27e3e62fd6295fcb70b8e7abb94",
+      "module": "cdc_ether.ko",
+      "architecture": "AArch64",
+      "depends": "usbcore,usbnet",
+      "vermagic": "6.18.54 SMP mod_unload aarch64",
+      "autoload": {
+        "etc/modules.d/usb-net-cdc-ether": "cdc_ether\n"
+      }
+    },
+    "kmod-usb-net-rndis": {
+      "filename": "kmod-usb-net-rndis-6.18.54-r1.apk",
+      "bytes": 5598,
+      "sha256": "42513ac512b2575e289149c7b901ac356c19c674333c05bde42d6351efba0d00",
+      "module_sha256": "e565de5ae7214789ee06244ff0576a1797a00dd1531a91cce4cd7b211f4168f1",
+      "module": "rndis_host.ko",
+      "architecture": "AArch64",
+      "depends": "usbcore,cdc_ether,usbnet",
+      "vermagic": "6.18.54 SMP mod_unload aarch64",
+      "autoload": {
+        "etc/modules.d/usb-net-rndis": "rndis_host\n"
+      }
+    }
+  }
+}

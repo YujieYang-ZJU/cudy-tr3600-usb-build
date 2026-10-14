@@ -2,6 +2,7 @@
 """Mirror Kernel/Configure/Default for a fast pre-compilation hash check."""
 import hashlib
 import json
+import os
 from pathlib import Path
 import re
 import subprocess
@@ -38,6 +39,9 @@ if 'CONFIG_TARGET_ROOTFS_INITRAMFS_SEPARATE=y\n' in config:
 (audit / 'kernel.config.set.plan').write_text(merged)
 enabled = [line for line in merged.splitlines() if re.search('=[ym]', line)]
 added = {'CONFIG_USB_USBNET=m', 'CONFIG_USB_NET_CDCETHER=m', 'CONFIG_USB_NET_RNDIS_HOST=m'}
+with_ncm = os.environ.get('USB_NCM') == '1'
+if with_ncm:
+    added.add('CONFIG_USB_NET_CDC_NCM=m')
 assert added.issubset(enabled), 'USB driver options differ from the PR'
 baseline = [line for line in enabled if line not in added]
 
@@ -46,7 +50,9 @@ def digest(lines):
 
 report = {'expected_baseline': '65a6123c8ad58cc9838d7f2e4fb4e60a',
           'baseline': digest(baseline), 'with_usb': digest(enabled),
-          'expected_with_usb': 'd276c938a20ad6318401925aa33b82de'}
+          'expected_with_usb': ('4c829362dbf0dcf539a4282b820a6327' if with_ncm
+                                else 'd276c938a20ad6318401925aa33b82de'),
+          'with_ncm': with_ncm, 'added_options': sorted(added)}
 (audit / 'kernel-plan-check.json').write_text(json.dumps(report, indent=2) + '\n')
 print(json.dumps(report, indent=2))
 assert report['baseline'] == report['expected_baseline'], 'Original kernel configuration not reproduced'

@@ -2,6 +2,7 @@
 """Inspect APK payloads without installing packages or running their scripts."""
 import hashlib
 import json
+import os
 from pathlib import Path
 import re
 import struct
@@ -14,6 +15,8 @@ artifacts = Path(sys.argv[2]).resolve()
 apk = root / 'staging_dir/host/bin/apk'
 names = {'kmod-mii': 'mii.ko', 'kmod-usb-net': 'usbnet.ko',
          'kmod-usb-net-cdc-ether': 'cdc_ether.ko', 'kmod-usb-net-rndis': 'rndis_host.ko'}
+if os.environ.get('USB_NCM') == '1':
+    names['kmod-usb-net-cdc-ncm'] = 'cdc_ncm.ko'
 report = {'kernel_dependency': '6.18.54~65a6123c8ad58cc9838d7f2e4fb4e60a-r1',
           'physical_device_tested': False, 'original_pr_tested_binaries': False, 'packages': {}}
 for name, module in names.items():

@@ -8,6 +8,8 @@ artifacts="$root/usb-artifacts"
 commit=31ef8052449426249b8ea364444df9adab80bfef
 expected=65a6123c8ad58cc9838d7f2e4fb4e60a
 jobs=${BUILD_JOBS:-2}
+ncm=${USB_NCM:-0}
+[[ "$ncm" == 0 || "$ncm" == 1 ]]
 phase=${1:?Specify a build phase}
 mkdir -p "$audit"
 
@@ -47,6 +49,7 @@ case "$phase" in
     python3 - "$recipe/reference" <<'PY'
 from pathlib import Path
 import sys
+import os
 ref = Path(sys.argv[1])
 lines = ['CONFIG_TARGET_mediatek=y', 'CONFIG_TARGET_mediatek_filogic=y',
          'CONFIG_TARGET_mediatek_filogic_DEVICE_cudy_tr3600-v1=y']
@@ -58,12 +61,17 @@ for item in (ref / 'config.buildinfo').read_text().splitlines():
         lines.append(item)
 for package in ['mii', 'usb-net', 'usb-net-cdc-ether', 'usb-net-rndis']:
     lines.append('CONFIG_PACKAGE_kmod-' + package + '=m')
+if os.environ.get('USB_NCM') == '1':
+    lines.append('CONFIG_PACKAGE_kmod-usb-net-cdc-ncm=m')
 Path('.config').write_text('\n'.join(lines) + '\n')
 PY
     ./scripts/ext-toolchain.sh --toolchain "$(cat "$audit/toolchain-root.txt")" --overwrite-config --config mediatek/filogic 2>&1 | tee "$root/usb-configure.log"
     for name in mii usb-net usb-net-cdc-ether usb-net-rndis; do
       grep -qx "CONFIG_PACKAGE_kmod-$name=m" .config
     done
+    if [[ "$ncm" == 1 ]]; then
+      grep -qx 'CONFIG_PACKAGE_kmod-usb-net-cdc-ncm=m' .config
+    fi
     python3 "$recipe/check-kernel-plan.py" "$source_dir" "$audit" 2>&1 | tee "$root/usb-plan-check.log"
     cp .config "$audit/build.config"
     ;;
@@ -77,9 +85,15 @@ PY
     make -j"$jobs" target/compile 2>&1 | tee "$root/usb-kernel.log"
     kernel=$(kernel_directory)
     cmp "$audit/kernel.config.set.plan" "$kernel/.config.set"
-    [[ $(cat "$kernel/.vermagic") == d276c938a20ad6318401925aa33b82de ]]
+    expected_current=d276c938a20ad6318401925aa33b82de
+    if [[ "$ncm" == 1 ]]; then expected_current=4c829362dbf0dcf539a4282b820a6327; fi
+    [[ $(cat "$kernel/.vermagic") == "$expected_current" ]]
     grep -qx '# CONFIG_MODVERSIONS is not set' "$kernel/.config"
     cp "$kernel/.config" "$audit/kernel.config.actual"
+    ;;
+  package-ncm)
+    [[ "$ncm" == 1 ]]
+    bash "$recipe/package-ncm.sh" "$source_dir" "$audit" "$artifacts" "$(kernel_directory)"
     ;;
   package)
     kernel=$(kernel_directory)
