@@ -20,4 +20,4 @@ cp -a "$root/full-openwrt/dl" "$stage/downloads"
 cp "$root/LICENSE" "$stage/"
 printf 'Corresponding source for this firmware and its same-build package archive.\nIncludes pinned OpenWrt/feed/OpenClash source, recipe and patches, actual configuration, and downloaded component sources.\nExtract openwrt-source.tar; apply the hardware patch from recipe/crostia-v19; firmware/build.sh records the remaining transformations.\nPrivate signing keys, credentials and personal router configurations are not included.\n' > "$stage/README-SOURCE.txt"
 tar --owner=0 --group=0 --numeric-owner -czf "$artifacts/corresponding-source.tar.gz" -C "$stage" .
-(cd "$artifacts" && sha256sum corresponding-source.tar.gz >> SHA256SUMS)
+(cd "$artifacts" && sha256sum corresponding-source.tar.gz > SOURCE-SHA256SUMS)

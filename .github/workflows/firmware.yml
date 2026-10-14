@@ -35,23 +35,59 @@ jobs:
         run: bash firmware/build.sh prepare
       - name: Check selected device, USB drivers and OpenClash dependencies
         run: bash firmware/build.sh configure
+      - name: Restore matching host tools and compiler cache
+        id: tool-cache
+        uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830
+        with:
+          key: tr3600-ubuntu24-gcc14.4-${{ hashFiles('firmware/sources.json', 'firmware/config.seed', 'crostia-v19/tr3600-support-rebased.patch') }}
+          path: |
+            full-openwrt/staging_dir/host
+            full-openwrt/staging_dir/hostpkg
+            full-openwrt/staging_dir/toolchain-*
+            full-openwrt/build_dir/host
+            full-openwrt/build_dir/hostpkg
+            full-openwrt/build_dir/toolchain-*
       - name: Download corresponding component sources
         run: bash firmware/build.sh download
       - name: Build host tools and GCC 14.4.0 toolchain
         run: bash firmware/build.sh tools
+      - name: Save host tools and compiler before building firmware
+        if: steps.tool-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830
+        with:
+          key: ${{ steps.tool-cache.outputs.cache-primary-key }}
+          path: |
+            full-openwrt/staging_dir/host
+            full-openwrt/staging_dir/hostpkg
+            full-openwrt/staging_dir/toolchain-*
+            full-openwrt/build_dir/host
+            full-openwrt/build_dir/hostpkg
+            full-openwrt/build_dir/toolchain-*
       - name: Build kernel, packages and sysupgrade image
         run: bash firmware/build.sh firmware
       - name: Check image, rootfs and same-build driver packages
         run: bash firmware/build.sh collect
       - name: Archive corresponding source without private signing keys
         run: bash firmware/build.sh source
-      - name: Upload checked firmware candidate and corresponding source
+      - name: Upload corresponding source and checksum
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: tr3600-v1-community-firmware-source
+          path: |
+            full-artifacts/corresponding-source.tar.gz
+            full-artifacts/SOURCE-SHA256SUMS
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 14
+      - name: Upload checked firmware candidate
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: tr3600-v1-usb-openclash-firmware-candidate
           path: |
             full-artifacts/*
             !full-artifacts/packages/**
+            !full-artifacts/corresponding-source.tar.gz
+            !full-artifacts/SOURCE-SHA256SUMS
           if-no-files-found: error
           compression-level: 0
           retention-days: 14
