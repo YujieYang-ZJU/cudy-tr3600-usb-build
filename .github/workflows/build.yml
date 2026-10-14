@@ -1,0 +1,50 @@
+name: Build TR3600 V1 USB firmware
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tr3600-usb-firmware
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 350
+    steps:
+      - name: Check out build configuration
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Prepare Linux build environment
+        run: |
+          sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/ghc
+          sudo apt-get update
+          sudo apt-get install -y build-essential clang flex bison g++ gawk gettext git \
+            libncurses-dev libssl-dev python3 python3-setuptools rsync unzip zlib1g-dev \
+            file wget curl libelf-dev swig xsltproc zstd time
+          df -h .
+      - name: Build firmware and verify artifacts
+        run: bash build-firmware.sh
+      - name: Upload firmware
+        if: success()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: cudy-tr3600-v1-usb-firmware
+          path: artifacts/
+          if-no-files-found: error
+          retention-days: 7
+      - name: Upload build logs
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: tr3600-build-logs
+          path: |
+            *.log
+            openwrt/.config
+            openwrt/feeds.conf
+          if-no-files-found: ignore
+          retention-days: 7

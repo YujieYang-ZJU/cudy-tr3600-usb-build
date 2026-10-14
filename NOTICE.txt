@@ -1,0 +1,20 @@
+Cudy TR3600 V1 USB network firmware build
+
+Source: OpenWrt PR #24596, pinned commit 046aec0dccd90f5a156cb8e9725c121c81955dd3.
+Hardware fixes: hyqhyq3/openwrt-cudy-tr3600 v1.0.0,
+commit 58d04dab73dd482f7c288cbdf3b3e30de29f0ae7.
+Upstream components retain their original licenses.
+
+This image includes USB RNDIS, CDC-ECM and CDC-NCM host drivers.
+It also includes LuCI HTTPS administration and Chinese base translations,
+USB diagnostics and the WireGuard/GRE tools selected in the reference build.
+
+This is a complete firmware image for Cudy TR3600 V1 only.
+Its kernel differs from the user's existing Linux 6.18.54 SNAPSHOT build.
+Do not extract its kernel modules and install them on that existing firmware.
+Compilation and artifact checks do not constitute testing on the physical router.
+Save the router configuration and keep its existing firmware image before upgrading.
+
+构建完成后，通过校验只能确认文件完整性、设备标识和驱动是否包含。
+USB 与无线的实际工作情况仍需在 TR3600 V1 真机上确认。
+刷机前备份当前配置并保留现用固件；跨分支升级时，旧配置需要单独核对。
