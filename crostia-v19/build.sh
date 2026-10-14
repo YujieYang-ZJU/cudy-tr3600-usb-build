@@ -34,6 +34,12 @@ if [[ "$phase" == prepare ]]; then
 fi
 
 cd "$source_dir"
+kernel_directory() {
+  local candidates=()
+  mapfile -t candidates < <(find "$source_dir/build_dir" -type d -path '*/linux-mediatek_filogic/linux-6.18.54')
+  [[ ${#candidates[@]} == 1 ]] || { echo 'Expected exactly one target kernel directory' >&2; return 1; }
+  printf '%s\n' "${candidates[0]}"
+}
 case "$phase" in
   configure)
     # Every shipped kernel package is selected to preserve the kernel Kconfig.
@@ -69,14 +75,14 @@ PY
     ;;
   kernel)
     make -j"$jobs" target/compile 2>&1 | tee "$root/usb-kernel.log"
-    kernel="$source_dir/build_dir/target-aarch64_cortex-a53_musl/linux-mediatek_filogic/linux-6.18.54"
+    kernel=$(kernel_directory)
     cmp "$audit/kernel.config.set.plan" "$kernel/.config.set"
     [[ $(cat "$kernel/.vermagic") == d276c938a20ad6318401925aa33b82de ]]
     grep -qx '# CONFIG_MODVERSIONS is not set' "$kernel/.config"
     cp "$kernel/.config" "$audit/kernel.config.actual"
     ;;
   package)
-    kernel="$source_dir/build_dir/target-aarch64_cortex-a53_musl/linux-mediatek_filogic/linux-6.18.54"
+    kernel=$(kernel_directory)
     modules=(drivers/net/mii.ko drivers/net/usb/usbnet.ko drivers/net/usb/cdc_ether.ko drivers/net/usb/rndis_host.ko)
     for module in "${modules[@]}"; do
       readelf -p .modinfo "$kernel/$module" | grep -q 'vermagic=6.18.54 SMP mod_unload aarch64$'
@@ -86,7 +92,17 @@ PY
     # The PR checks the original hash after removing only three new Kconfig lines.
     # This gate must pass before changing any APK dependency metadata.
     python3 "$recipe/check-kernel-plan.py" "$source_dir" "$audit"
-    bash "$recipe/pr/repack-crostia-v19-usb.sh" "$source_dir" 2>&1 | tee "$root/usb-repack.log"
+    # Preserve the PR script unchanged; adapt only its build-directory lookup.
+    python3 - "$recipe/pr/repack-crostia-v19-usb.sh" "$audit/repack-adapted.sh" "$kernel" <<'PY'
+from pathlib import Path
+import shlex, sys
+source, dest, kernel = map(Path, sys.argv[1:])
+text = source.read_text()
+old = 'kernel="$root/build_dir/target-aarch64_cortex-a53_musl/linux-mediatek_filogic/linux-6.18.54"'
+assert text.count(old) == 1
+dest.write_text(text.replace(old, 'kernel=' + shlex.quote(str(kernel))))
+PY
+    bash "$audit/repack-adapted.sh" "$source_dir" 2>&1 | tee "$root/usb-repack.log"
     (cd "$kernel" && sha256sum -c "$audit/modules-before-packaging.SHA256SUMS")
     mkdir -p "$artifacts/metadata"
     for name in kmod-mii kmod-usb-net kmod-usb-net-cdc-ether kmod-usb-net-rndis; do

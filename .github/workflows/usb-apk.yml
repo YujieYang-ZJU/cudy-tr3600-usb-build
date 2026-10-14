@@ -52,6 +52,21 @@ jobs:
             usb-*.log
             usb-audit/
             usb-openwrt/.config
-            usb-openwrt/build_dir/target-aarch64_cortex-a53_musl/linux-mediatek_filogic/linux-6.18.54/.config*
+            usb-openwrt/build_dir/*/linux-mediatek_filogic/linux-6.18.54/.config*
           if-no-files-found: warn
+          retention-days: 14
+      - name: Preserve intermediate driver files
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: crostia-v19-usb-intermediate
+          path: |
+            usb-openwrt/bin/targets/mediatek/filogic/packages/kmod-mii-*.apk
+            usb-openwrt/bin/targets/mediatek/filogic/packages/kmod-usb-net-*.apk
+            usb-openwrt/usb-apk-v19.*/
+            usb-openwrt/build_dir/*/linux-mediatek_filogic/linux-6.18.54/drivers/net/mii.ko
+            usb-openwrt/build_dir/*/linux-mediatek_filogic/linux-6.18.54/drivers/net/usb/usbnet.ko
+            usb-openwrt/build_dir/*/linux-mediatek_filogic/linux-6.18.54/drivers/net/usb/cdc_ether.ko
+            usb-openwrt/build_dir/*/linux-mediatek_filogic/linux-6.18.54/drivers/net/usb/rndis_host.ko
+          if-no-files-found: ignore
           retention-days: 14
