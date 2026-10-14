@@ -40,7 +40,7 @@ cd "$SOURCE_DIR"
 case "$PHASE" in
   configure)
     ./scripts/feeds update -a 2>&1 | tee "$BUILD_ROOT/feeds-update.log"
-    ./scripts/feeds install -a 2>&1 | tee "$BUILD_ROOT/feeds-install.log"
+    ./scripts/feeds install luci-ssl luci-i18n-base-zh-cn luci-proto-wireguard usbutils 2>&1 | tee "$BUILD_ROOT/feeds-install.log"
     cp "$BUILD_ROOT/config/tr3600-usb.config" .config
     make defconfig 2>&1 | tee "$BUILD_ROOT/defconfig.log"
     for setting in \
