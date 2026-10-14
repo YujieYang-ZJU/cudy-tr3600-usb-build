@@ -1,0 +1,57 @@
+name: Build Crostia v1.9 USB driver APKs
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: crostia-v19-usb-apk
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 300
+    steps:
+      - name: Check out build recipe
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Prepare Linux build environment
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential clang flex bison g++ gawk gettext git \
+            libncurses-dev libssl-dev python3 python3-setuptools rsync unzip zlib1g-dev \
+            file wget curl libelf-dev swig xsltproc zstd time
+      - name: Prepare pinned source and compiler
+        run: bash crostia-v19/build.sh prepare
+      - name: Reconstruct and check kernel configuration
+        run: bash crostia-v19/build.sh configure
+      - name: Build required host tools
+        run: bash crostia-v19/build.sh tools
+      - name: Compile kernel and modules
+        run: bash crostia-v19/build.sh kernel
+      - name: Package four USB drivers and verify metadata
+        run: bash crostia-v19/build.sh package
+      - name: Upload driver packages
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: crostia-v19-usb-apk-candidates
+          path: usb-artifacts/
+          if-no-files-found: error
+          retention-days: 14
+      - name: Upload configuration and logs
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: crostia-v19-usb-build-audit
+          include-hidden-files: true
+          path: |
+            usb-*.log
+            usb-audit/
+            usb-openwrt/.config
+            usb-openwrt/build_dir/target-aarch64_cortex-a53_musl/linux-mediatek_filogic/linux-6.18.54/.config*
+          if-no-files-found: warn
+          retention-days: 14
