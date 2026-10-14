@@ -77,14 +77,19 @@ cd "$source_dir"
 case "$phase" in
     configure)
         ./scripts/feeds update -a 2>&1 | tee "$root/full-feeds-update.log"
-        ./scripts/feeds install -a 2>&1 | tee "$root/full-feeds-install.log"
+        ./scripts/feeds install luci-ssl luci-compat usbutils usb-modeswitch bash curl ruby ruby-yaml unzip 2>&1 | tee "$root/full-feeds-install.log"
         cp "$recipe/config.seed" .config
         if [[ "$external" == 1 ]]; then
             ./scripts/ext-toolchain.sh --toolchain "$(cat "$audit/toolchain-root.txt")" --overwrite-config --config mediatek/filogic
         else
             make defconfig
+        fi 2>&1 | tee "$root/full-configure.log"
+        if grep -qE 'recursive dependency detected|:error:' "$root/full-configure.log"; then
+            echo 'Kconfig reported an error; refusing to build an incomplete configuration.' >&2
+            exit 1
         fi
-        for option in luci-ssl luci-i18n-base-zh-cn luci-compat luci-app-openclash dnsmasq-full kmod-mii kmod-usb-net kmod-usb-net-cdc-ether kmod-usb-net-rndis kmod-usb-net-cdc-ncm usbutils usb-modeswitch kmod-tun kmod-inet-diag kmod-nft-tproxy kmod-nft-socket ruby-yaml; do
+        grep -qx 'CONFIG_LUCI_LANG_zh_Hans=y' .config
+        for option in luci-ssl luci-i18n-base-zh-cn luci-compat luci-app-openclash dnsmasq-full kmod-mii kmod-usb3 kmod-usb-net kmod-usb-net-cdc-ether kmod-usb-net-rndis kmod-usb-net-cdc-ncm usbutils usb-modeswitch kmod-tun kmod-inet-diag kmod-nft-tproxy kmod-nft-socket ruby-yaml; do
             grep -qx "CONFIG_PACKAGE_$option=y" .config || { echo "Required package missing: $option" >&2; exit 1; }
         done
         grep -qx '# CONFIG_PACKAGE_dnsmasq is not set' .config
